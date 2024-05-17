@@ -68,3 +68,137 @@ class KinogoPage:
         sorting_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f'button.js-xs-sort[data-value="{sorting}"]')))
         sorting_option.click()
         assert f'data-value="{sorting}"' in self.driver.page_source, f"Failed to select the sorting mode: {sorting}"
+
+    def navigate_to_registration(self):
+        logging.info('Navigating to the registration page')
+        self.driver.get('https://kinogo.biz/index.php?do=register')
+
+    def accept_terms(self):
+        logging.info('Accepting the terms')
+        accept_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'input.bbcodes[value="Принимаю"]')))
+        accept_button.click()
+
+    def enter_registration_details(self, name, password, email, sec_code):
+        logging.info('Entering the registration details')
+        name_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'name')))
+        name_input.send_keys(name)
+
+        password1_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'password1')))
+        password1_input.send_keys(password)
+
+        password2_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'password2')))
+        password2_input.send_keys(password)
+
+        email_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'email')))
+        email_input.send_keys(email)
+
+        sec_code_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'sec_code')))
+        sec_code_input.send_keys(sec_code)
+
+    def submit_registration(self):
+        logging.info('Submitting the registration form')
+        submit_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.btn[name="submit"]')))
+        submit_button.click()
+
+    def register(self, name, password, email, sec_code):
+        self.navigate_to_registration()
+        self.accept_terms()
+        self.enter_registration_details(name, password, email, sec_code)
+        self.submit_registration()
+
+    def login(self, username, password):
+        logging.info('Logging in')
+        self.driver.get('https://kinogo.biz/index.php?do=login')
+        time.sleep(3)
+
+        logging.info('Clicking on the login link')
+        login_link = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[onclick="change(\'test\')"]')))
+        login_link.click()
+
+        username_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'login_name')))
+        username_input.send_keys(username)
+        time.sleep(3)
+        password_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'login_password')))
+        password_input.send_keys(password)
+
+        login_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.fbutton2[title="Войти"]')))
+        login_button.click()
+
+    def add_to_favorites(self, movie_url):
+        logging.info('Adding movie to favorites')
+        time.sleep(2)
+        self.driver.get(movie_url)
+        self.driver.execute_script("document.querySelector('a[title=\"Закладки\"] span').click();")
+
+    def open_favorites(self):
+        logging.info('Opening favorites')
+        self.driver.get('https://kinogo.biz/favorites/')
+
+    def password_checker(self):
+        logging.info('Checking password')
+        self.driver.get('https://kinogo.biz/user/dfsalkj/')
+        logging.info('Finding and clicking on the "edit profile" link')
+        edit_profile_link = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.LINK_TEXT, 'редактировать профиль')))
+        time.sleep(2)
+        edit_profile_link.click()
+        time.sleep(2)
+        self.driver.find_element(By.NAME, 'altpass').send_keys('GSm-XVzy5h8Fa#H')
+        self.driver.find_element(By.NAME, 'password1').send_keys('sdfas12314')
+        self.driver.find_element(By.NAME, 'submit').click()
+        time.sleep(5)
+
+    def watch_movie(self):
+        logging.info('Watching movie')
+        self.driver.get('https://kinogo.biz/82065-pchelovod.html')
+        time.sleep(5)
+        play_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.play-button')))
+        play_button.click()
+
+    def add_comment(self, comment):
+        logging.info('Adding comment')
+        self.driver.get('https://kinogo.biz/82065-pchelovod.html')
+
+        add_comment_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, '//span[contains(@onclick, "commentForm") and contains(@onclick, "toggle")]')))
+        add_comment_button.click()
+
+        comment_input = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, 'comments')))
+        comment_input.send_keys(comment)
+
+        submit_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.fbutton[title="Добавить комментарий"]')))
+        submit_button.click()
+        time.sleep(10)
+
+    def change_movie_status(self):
+        logging.info('Changing movie status')
+        self.driver.get('https://kinogo.biz/82065-pchelovod.html')
+        watched_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'a.usermark__item[data-folder="done"]')))
+        watched_button.click()
+        time.sleep(10)
+
+    def change_avatar(self, image_path):
+        logging.info('Changing avatar')
+        self.driver.get('https://kinogo.biz/user/dfsalkj/')
+        time.sleep(3)
+        edit_profile_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//a[contains(@href, "javascript:ShowOrHide(\'options\')")]')))
+        edit_profile_button.click()
+        time.sleep(3)
+        file_input = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.NAME, 'image')))
+        file_input.send_keys(image_path)
+        time.sleep(3)
+        save_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'input.fbutton[value="Сохранить"]')))
+        save_button.click()
+        time.sleep(10)
